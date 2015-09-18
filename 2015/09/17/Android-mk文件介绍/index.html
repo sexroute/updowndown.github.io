@@ -1,0 +1,783 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+
+
+  <meta name="keywords" content="Android,NDK," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="概述
+Android.mk文件位于项目目录下的jni/子文件夹中。它向编译系统描述你的资源文件以及共享库文件。它实际上是一个小型的GNU makefile片段。编译系统在编译过程中会对它进行一次或多次解析。Android.mk文件主要是用于定义在Application.mk、编译系统以及环境变量中所没有定义的项目级别的设定。它还能复写指定模块的项目级别的设定。
+Android.mk的语法允许你将源">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android.mk文件介绍">
+<meta property="og:url" content="/2015/09/17/Android-mk文件介绍/index.html">
+<meta property="og:site_name" content="风过留痕">
+<meta property="og:description" content="概述
+Android.mk文件位于项目目录下的jni/子文件夹中。它向编译系统描述你的资源文件以及共享库文件。它实际上是一个小型的GNU makefile片段。编译系统在编译过程中会对它进行一次或多次解析。Android.mk文件主要是用于定义在Application.mk、编译系统以及环境变量中所没有定义的项目级别的设定。它还能复写指定模块的项目级别的设定。
+Android.mk的语法允许你将源">
+<meta property="og:updated_time" content="2015-09-17T09:04:16.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android.mk文件介绍">
+<meta name="twitter:description" content="概述
+Android.mk文件位于项目目录下的jni/子文件夹中。它向编译系统描述你的资源文件以及共享库文件。它实际上是一个小型的GNU makefile片段。编译系统在编译过程中会对它进行一次或多次解析。Android.mk文件主要是用于定义在Application.mk、编译系统以及环境变量中所没有定义的项目级别的设定。它还能复写指定模块的项目级别的设定。
+Android.mk的语法允许你将源">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> Android.mk文件介绍 | 风过留痕 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">风过留痕</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              Android.mk文件介绍
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-17T16:58:03+08:00" content="2015-09-17">
+            2015-09-17
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/Android开发/" itemprop="url" rel="index">
+                  <span itemprop="name">Android开发</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="概述">概述</h1><hr>
+<p><code>Android.mk</code>文件位于项目目录下的<code>jni/</code>子文件夹中。它向编译系统描述你的资源文件以及共享库文件。它实际上是一个小型的GNU makefile片段。编译系统在编译过程中会对它进行一次或多次解析。<code>Android.mk</code>文件主要是用于定义在<code>Application.mk</code>、编译系统以及环境变量中所没有定义的项目级别的设定。它还能复写指定模块的项目级别的设定。</p>
+<p><code>Android.mk</code>的语法允许你将源文件组织为<em>模块</em>的形式。一个模块可以是一个静态库、一个共享库或者是一个独立的可执行文件。你可以在每个<code>Android.mk</code>中定义一个或多个模块，也可以在多个模块用使用同一个源文件。编译系统只会把共享库放到你的程序包中。另外，静态库可以生成共享库。</p>
+<p>除了打包库文件之外，编译系统还会为你处理许多细节问题。泪如，你不需要在你的<code>Android.mk</code>中列出头文件或列出生成文件的显式的依赖，NDK编译系统会自动为你计算它们之间的依赖关系。这样，当未来的NDK版本中出现新的工具链/平台支持时，你就不需要再改动你的<code>Android.mk</code>文件了。</p>
+<p>尽管使用的编译系统不同，这里的语法与Android Open Source项目中所发布的<code>Android.mk</code>文件的语法非常相似。这样做的目的是为了让应用开发人员更容易的服用他们的外部库文件的源代码。</p>
+<a id="more"></a>
+<h1 id="基础知识">基础知识</h1><hr>
+<p>在详细了解语法知识之前，最好先对<code>Android.mk</code>文件中包含什么信息有一个基础的了解。这一节使用<code>Hello-JNI</code>示例中的<code>Android.mk</code>文件解释一下每一行都起到了什么作用。</p>
+<p>一个<code>Android.mk</code>文件必须以定义<code>LOCAL_PATH</code>变量起始：<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH := $(<span class="flow">call</span> my-<span class="built_in">dir</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这个变量指示了源文件在开发树中的位置。变量中的宏函数<code>my-dir</code>由编译系统提供，它返回当前目录的路径（<code>Android.mk</code>所在目录)。</p>
+<p>下一行声明了<code>CLEAR_VARS</code>变量，它的值由编译系统提供。<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">CLEAR_VARS</span>)</span><br></pre></td></tr></table></figure></p>
+<p><code>CLEAR_VARS</code>变量指向一个特定的GNU Makefile文件，它会为你清除许多<code>LOCAL_XXX</code>变量，例如<code>LOCAL_MODULE</code>，<code>LOCALE_SRC_FILES</code>，<code>LOCAL_STATIC_LIBRARIES</code>。记住，它并不清除<code>LOCAL_PATH</code>变量。GNU编译系统在同一个环境下解析所有的编译控制文件，在这里，所有的变量都是全局的，因此，你必须在描述每一个模块之前重新声明<code>CLEAR_VARS</code>。</p>
+<p>下一行的<code>LOCAL_MODULE</code>变量存储的是你想要构建的模块的名字。应用中的每一个模块都应声明一次该变量。<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_MODULE </span>:<span class="value">= hello-jni</span></span></span><br></pre></td></tr></table></figure></p>
+<p>每个模块的名字必须唯一，并且不含有空格。编译系统在生成最终的共享库文件时，会自动为它添加相应的前缀和后缀。例如，上面的例子中，最后生成的库文件名为<code>libhello-jni.so</code>。</p>
+<blockquote>
+<p><strong>注</strong>: 如果你的名字中已经以<code>lib</code>起始。编译系统不会再为它添加<code>lib</code>前缀。因此若模块名为<code>libfoo</code>，最后生成的库文件为<code>libfoo.so</code>。</p>
+</blockquote>
+<p>再下一行枚举了所有的源文件，通过空格来分隔多个文件：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_SRC_FILES </span>:<span class="value">= hello-jni.c</span></span></span><br></pre></td></tr></table></figure></p>
+<p>LOCAL_SRC_FILES变量必须包含编译进模块中的C或C++文件列表。</p>
+<p>最后一行帮助编译系统将所有一切整合在一起<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">BUILD_SHARED_LIBRARY</span>)</span><br></pre></td></tr></table></figure></p>
+<p><code>BUILD_SHARED_LIBRARY</code>指向一个GNU Makfile脚本，它会收集你在<code>LOCAL_XXX</code>变量中定义的所有信息。这个脚本决定编译什么以及如何编译。</p>
+<h1 id="变量与宏定义">变量与宏定义</h1><hr>
+<p>编译系统在<code>Android.mk</code>文件中提供了许多可用的变量。这些变量都有预设的值。</p>
+<p>除了这些变量之外，你还能定义自己的变量。当你这么做的时候，需要记住以下名字是被NDK编译系统自己保留的：</p>
+<ul>
+<li>以<code>LOCAL_</code>开头的名字，如<code>LOCAL_MODULE</code>。</li>
+<li>以<code>PRIVATE_</code>，<code>NDK_</code>，<code>APP</code>开头的名字，这些名字在编译系统内部使用</li>
+<li>小写的名字，如<code>my-dir</code>，同样，这些名字在编译系统内部使用。<br>因此，如果你要在<code>Android.mk</code>中定义自己的变量，最好使用<code>MY_</code>开头。</li>
+</ul>
+<h2 id="NDK_预定义变量">NDK 预定义变量</h2><hr>
+<p>这一节讨论编译系统在解析你的<code>Android.mk</code>之前预定义的一些GNU Make变量。在特定环境下，NDK可能会多次解析你的<code>Android.mk</code>文件，每次使用一套不同的变量定义。</p>
+<h3 id="CLEAR_VALS">CLEAR_VALS</h3><p>这个变量指向一个脚本，它会解除在”开发者定义变量”中列出的几乎所有<code>LOCAL_XXX</code>变量。每次描述一个新的模块时，使用这个变量来包含这个脚本。<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">CLEAR_VARS</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="BUILD_SHARED_LIBRARY">BUILD_SHARED_LIBRARY</h3><p>这个变量指向一个编译脚本，它会收集所有你定义的关于这个模块的<code>LOCAL_XXX</code>变量信息，并决定如何根据你所列出的源文件来编译一个共享库。记住，在使用这个脚本之前，你必须至少定义了<code>LOCAL_MODULE</code>以及<code>LOCAL_SRC_FILES</code>变量。<br>使用语法为：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">BUILD_SHARED_LIBRARY</span></span><br></pre></td></tr></table></figure></p>
+<p>使用共享库变量会让编译系统生成一个<code>.so</code>文件。</p>
+<h3 id="BUILD_STATIC_LIBRARY">BUILD_STATIC_LIBRARY</h3><p><code>BUILD_STATIC_LIBRARY</code>用于生成静态库。编译系统不会将静态库拷贝到你的项目/包中。但是它可以用于生成共享库文件（参考<code>LOCAL_STATIC_LIBRARIES</code>以及`LOCAL_WHOLE_STATIC_LIBRARIES）。<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">BUILD_STATIC_LIBRARY</span>)</span><br></pre></td></tr></table></figure></p>
+<p>使用静态库变量会让编译系统生成一个<code>.a</code>库文件。</p>
+<h3 id="PREBUILT_SHARED_LIBRARY">PREBUILT_SHARED_LIBRARY</h3><p>指向一个用于指定已编译好的共享库文件的编译脚本。与<code>BUILD_SHARED_LIBRARY</code>以及<code>BUILD_STATIC_LIBRARY</code>不同，这里的<code>LOCAL_SRC_FILES</code>不能是源文件，而应该是指向一个单独的已编译好的共享库文件，如<code>foo/libfoo.so</code>。使用语法如下：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">PREBUILT_SHARED_LIBRARY</span>)</span><br></pre></td></tr></table></figure></p>
+<p>你也能通过使用<code>LOCAL_PREBUILTS</code>变量指向另一个模块预先编译好的库文件。关于使用预编译库的跟多信息，可参考<a href="https://developer.android.com/ndk/guides/prebuilts.html" target="_blank" rel="external">使用预编译库</a></p>
+<h3 id="PREBUILT_STATIC_LIBRARY">PREBUILT_STATIC_LIBRARY</h3><p>与<code>PREBUILT_SHARED_LIBRARY</code>相同，但是应用于静态库文件。</p>
+<h3 id="TARGET_ARCH">TARGET_ARCH</h3><p>由Android Open Source Project给出的目标CPU架构的名字。对于任意ARM兼容的构建，使用<code>arm</code>，独立于ABI变量所指定的CPU架构版本（参考下面的<code>TARGET_ARCH_ABI</code>）。</p>
+<h3 id="TARGET_PLATFORM">TARGET_PLATFORM</h3><p>编译系统目标Android API等级。例如，Android 5.1系统对应的是Android API 22：<code>android-22</code>。关于完整的对应信息，查看<a href="https://developer.android.com/ndk/guides/stable_apis.html" target="_blank" rel="external">Android NDK Native APIs</a>。使用示例：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TARGET_PLATFORM := android-<span class="number">22</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="TARGET_ARCH_ABI">TARGET_ARCH_ABI</h3><p>这个变量存储目标CPU与架构的信息。你可以指定一个或多个下表中的值，通过空格分隔。<br><strong>表1.</strong> ABI设定与不同的CPU架构</p>
+<table>
+<thead>
+<tr>
+<th>CPU and architecture</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ARMv5TE</td>
+<td>armeabi</td>
+</tr>
+<tr>
+<td>ARMv7</td>
+<td>armeabi-v7a</td>
+</tr>
+<tr>
+<td>ARMv8 AArch64</td>
+<td>arm64-v8a</td>
+</tr>
+<tr>
+<td>i686</td>
+<td>x86</td>
+</tr>
+<tr>
+<td>x86-64</td>
+<td>x86_64</td>
+</tr>
+<tr>
+<td>mips32(r1)</td>
+<td>mips</td>
+</tr>
+<tr>
+<td>mips64(r6)</td>
+<td>mips64</td>
+</tr>
+<tr>
+<td>All</td>
+<td>all</td>
+</tr>
+</tbody>
+</table>
+<p>以下示例表示设定目标为 ARMv8 AArch64：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">TARGET_ARCH_ABI </span>:<span class="value">= arm64-v8a</span></span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>注：</strong> 直到Android NDK 1.6_r1为止，这个变量都被定义为<code>arm</code>。</p>
+</blockquote>
+<p>关于架构ABI以及相关的兼容问题，参考<a href="https://developer.android.com/ndk/guides/abis.html" target="_blank" rel="external">ABI Management</a>。</p>
+<h3 id="TARGET_ABI">TARGET_ABI</h3><p>目标Android API等级与ABI的串联信息。在你希望在一个真实设备上进行测试时非常有用。例如，可以指定一个运行于Android API level 22下的64位ARM设备。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TARGET_ABI := android-<span class="number">22</span>-arm64-v8a</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>注：</strong>直到Android NDK 1.6_r1为止，它的默认值都是<code>android-3-arm</code>。</p>
+</blockquote>
+<h2 id="模块描述变量">模块描述变量</h2><hr>
+<p>本节中描述的变量用于向编译系统描述你的模块。每一个模块描述都应遵循以下流程：</p>
+<ol>
+<li>使用<code>CLEAR_VARS</code>初始化变量</li>
+<li>为模块相关变量赋值</li>
+<li>使用<code>BUILD_XXX</code>变量编译模块</li>
+</ol>
+<h3 id="LOCAL_PATH">LOCAL_PATH</h3><p>定义当前文件路径。你必须在<code>Android.mk</code>开头定义这个变量。<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH := $(<span class="flow">call</span> my-<span class="built_in">dir</span>)</span><br></pre></td></tr></table></figure></p>
+<p><code>CLEAR_VARS</code>不会清除这个变量的值。因此，若你在<code>Android.mk</code>中描述了多个模块，只需要定义一次即可。</p>
+<h3 id="LOCAL_MODULE">LOCAL_MODULE</h3><p>模块名，必须唯一并且不含空格。你必须在包含任意脚本前定义该变量（除了<code>CLEAR_VARS</code>）。你不需要添加<code>lib</code>前缀或<code>.a</code>，<code>.so</code>后缀。<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_MODULE </span>:<span class="value">= <span class="string">"foo"</span></span></span></span><br></pre></td></tr></table></figure></p>
+<p>如果你需要指定生成文件的名字，而不是系统自动生成。你可以使用<code>LOCAL_MODULE_FILENAME</code>变量。</p>
+<h3 id="LOCAL_MODULE_FILENAME">LOCAL_MODULE_FILENAME</h3><p>可选变量，用于替换系统自动生成的文件名，如下例，会生出<code>libnewfoo</code>文件而不是<code>libfoo</code>文件。<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">LOCAL_MODULE :</span>= foo</span><br><span class="line"><span class="string">LOCAL_MODULE_FILENAME :</span>= libnewfoo</span><br></pre></td></tr></table></figure></p>
+<p>对于共享库文件，示例所生成的文件名为<code>libnewfoo.so</code></p>
+<blockquote>
+<p><strong>注：</strong> 你不能更改文件路径或拓展名</p>
+</blockquote>
+<h3 id="LOCAL_SRC_FILES">LOCAL_SRC_FILES</h3><p>指定生成模块所需的文件列表。只需列出编译系统实际进行编译的文件，因为编译系统会自动计算相关的依赖。<br>既可以使用相对路径（相对于<code>LOCAL_PATH</code>），也可以使用绝对路径。<br>建议使用相对路径以便于移植。</p>
+<blockquote>
+<p><strong>注：</strong> 系统无法识别Windows形式的斜杠(\)，只能识别Unix格式的斜杠(/)</p>
+</blockquote>
+<h3 id="LOCAL_CPP_EXTENSION">LOCAL_CPP_EXTENSION</h3><p>可选变量，用于指定非<code>.cpp</code>后缀作为C++源文件的后缀。例如，你可以使用<code>.cxx</code>作为文件后缀（必须包含点）。<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_CPP_EXTENSION </span>:<span class="value">= .cxx</span></span></span><br></pre></td></tr></table></figure></p>
+<p>从NDK r7开始，你可以使用多种类型的格式，如<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_CPP_EXTENSION := <span class="class">.cxx</span> <span class="class">.cpp</span> .cc</span><br></pre></td></tr></table></figure></p>
+<h3 id="LOCAL_CPP_FEATURES">LOCAL_CPP_FEATURES</h3><p>可选变量，指定代码所依赖的C++特性。它会在编译过程中启用正确的编译与链接选项。对于预编译二进制文件，这个变量同样声明了二进制文件所依赖的特性，以便于保证最终链接顺利。建议使用该变量而不是直接在<code>LOCAL_CPPFLAGS</code>中启用<code>-frtti</code>与<code>-fexceptions</code>。<br>使用<code>LOCAL_CPP_FEATURES</code>允许编译系统为每一个模块提供合适的编译选项，而<code>LOCAL_CPPFLAGS</code>会导致编译器为所有的模块使用同一套编译选项，而不考虑实际所需。<br>例如，指定使用RTTI（运行时类型信息）<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_CPP_FEATURES </span>:<span class="value">= rtti</span></span></span><br></pre></td></tr></table></figure></p>
+<p>指定使用C++异常<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_CPP_FEATURES </span>:<span class="value">= exceptions</span></span></span><br></pre></td></tr></table></figure></p>
+<p>你也可以因此指定多个值，如<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_CPP_FEATURES </span>:<span class="value">= rtti features</span></span></span><br></pre></td></tr></table></figure></p>
+<p>指定顺序没有影响</p>
+<h3 id="LOCAL_C_INCLUDES">LOCAL_C_INCLUDES</h3><p>可选变量，指定头文件所在目录，相对于NDK<code>root</code>的路径，如：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_C_INCLUDES </span>:<span class="value">= sources/foo</span></span></span><br></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LO<span class="built_in">CAL_C_INCLUDES</span> := $(LO<span class="built_in">CAL_PATH</span>)<span class="comment">//foo</span></span><br></pre></td></tr></table></figure></p>
+<p>你必须在使用<code>LOCAL_CFLAGS</code>或<code>LOCAL_CPPFLAGS</code>进行任何相应的包含之前定义该变量。<br><code>ndk-gdb</code>调试同样会自动调用<code>LOCAL_C_INCLUDES</code>信息。</p>
+<h3 id="LOCAL_CFLAGS">LOCAL_CFLAGS</h3><p>可选变量，设置在编译时使用的编译标志。例如添加额外的宏定义，或编译选项。<br>尽量不要再<code>Android.mk</code>中更改优化/调试级别。编译系统会根据<code>Application.mk</code>中的信息自动处理相关设定。</p>
+<blockquote>
+<p><strong>注：</strong>在android-ndk-1.5_r1中，这个标志只会用于C源文件，而不会用于C++。</p>
+</blockquote>
+<p>你可以通过它指定额外的头文件路径：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_CFLAGS += -I<span class="tag">&lt;<span class="title">path</span>&gt;</span>,</span><br></pre></td></tr></table></figure></p>
+<p>但是最好还是通过<code>LOCAL_C_INCLUDES</code>来进行，以便于调试。</p>
+<h3 id="LOCAL_CPPFLAGS">LOCAL_CPPFLAGS</h3><p>可选，设置在编译时仅用于C++源文件的编译选项。这些编译选项在编译时会显示在<code>LOCAL_CFLAGS</code>之后。</p>
+<blockquote>
+<p><strong>注：</strong> 在android-ndk-1.5_r1中，这个标志同时应用于C与C++文件。</p>
+</blockquote>
+<h3 id="LOCAL_STATIC_LIBRARIES">LOCAL_STATIC_LIBRARIES</h3><p>指定当前模块所依赖的静态库。<br>若当前模块为共享库或可执行文件，这个变量所指定的库会被强制链接到生成的二进制文件中。<br>若当前模块为静态库，则该变量只是指示当前库所依赖的库列表。</p>
+<h3 id="LOCAL_SHARED_LIBRARIES">LOCAL_SHARED_LIBRARIES</h3><p>当前模块运行所需的共享库。该信息在链接时所使用，并被嵌入到生成的二进制文件中。</p>
+<h3 id="LOCAL_WHOLE_STATIC_LIBRARIES">LOCAL_WHOLE_STATIC_LIBRARIES</h3><p>这个变量为<code>LOCAL_SHARED_LIBRARIES</code>的变种。主要用于解决循环依赖问题。</p>
+<h3 id="LOCAL_LDLIBS">LOCAL_LDLIBS</h3><p>这个变量包含构建共享库或可执行文件所需的额外链接选项。它能让你用<code>-l</code>前缀指定想要链接的系统库。例如，你可以通过如下示例告诉链接器生成一个在启动时链接到<code>/system/lib/libz.so</code>库的模块：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">LOCAL_LDLIBS </span>:<span class="value">= -lz</span></span></span><br></pre></td></tr></table></figure></p>
+<p>关于可用的系统库列表，参考<a href="https://developer.android.com/ndk/guides/stable_apis.html" target="_blank" rel="external">Android NDK Native APIs</a>。</p>
+<blockquote>
+<p><strong>注：</strong>若你定义的模块是一个静态库，编译系统会忽视它，并输出一个警告信息。</p>
+</blockquote>
+<h3 id="LOCAL_LDFLAGS">LOCAL_LDFLAGS</h3><p>编译时使用的其它链接标志。如在 ARM/X86 GCC 4.6+ 上使用<code>ld.bfd</code>链接器而不是默认的<code>ld.gold</code>：<br><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_LDFLAGS += -fuse-<span class="keyword">ld</span>=bfd</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>注：</strong>若你定义的 模块 是一个静态库，编译系统会忽视它，并输出一个警告信息。</p>
+</blockquote>
+<h3 id="LOCAL_ALLOW_UNDEFINED_SYMBOLS">LOCAL_ALLOW_UNDEFINED_SYMBOLS</h3><p>是否允许未定义的符号变量存在。</p>
+<blockquote>
+<p><strong>注：</strong>若你定义的 模块 是一个静态库，编译系统会忽视它，并输出一个警告信息。</p>
+</blockquote>
+<h3 id="LOCAL_ARM_MODE">LOCAL_ARM_MODE</h3><p>编译系统默认生成<em>thumb</em>模式的二进制文件，即指令为16位宽度，并链接<code>thumb/</code>目录下的STL库。将这个变量设定为<code>arm</code>会强制编译系统生成32位的<code>arm</code>模式文件。<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="label">LOCAL_ARM_MODE</span> := <span class="preprocessor">arm</span></span><br></pre></td></tr></table></figure></p>
+<p>你也可以针对单独的源文件提供该编译选项，如下例中的<code>bar.c</code>会一直以ARM模式编译，而<code>foo.c</code>的编译模式则取决于<code>LOCAL_ARM_MODE</code>。<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_SRC_FILES := foo<span class="class">.c</span> bar<span class="class">.c</span><span class="class">.arm</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><strong>注：</strong>在<code>Application.mk</code>中将<code>APP_OPTIM</code>设置为<code>debug</code>同样可以启用ARM模式，因为调试器无法正确处理Thumb代码。</p>
+</blockquote>
+<h3 id="LOCAL_ARM_NEON">LOCAL_ARM_NEON</h3><p>这个参数只有在目标为<code>armeabi-v7a</code>时才有影响。它允许你在C和C++源码中使用ARM Advanced SIMD（NEON） GCC函数，以及在汇编文件中使用NEON指令。<br>记住这点，并不是所有的ARMv7架构的CPU都支持NEON指令集拓展。因此，你必须在运行时检测是否能够安全的使用这些代码。更多信息，请参考<a href="https://developer.android.com/ndk/guides/cpu-arm-neon.html" target="_blank" rel="external">NEON Support</a>与<a href="https://developer.android.com/ndk/guides/cpu-features.html" target="_blank" rel="external">The cpufeatures Library</a>。<br>同样，你可以针对指定源文件启用NEON支持：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_SRC_FILES = foo<span class="class">.c</span><span class="class">.neon</span> bar<span class="class">.c</span> zoo<span class="class">.c</span><span class="class">.arm</span><span class="class">.neon</span></span><br></pre></td></tr></table></figure></p>
+<p>同时指令两个后缀时，<code>.arm</code>必须在<code>.neon</code>之前。</p>
+<h3 id="LOCAL_DISABLE_NO_EXECUTE">LOCAL_DISABLE_NO_EXECUTE</h3><p>未了解</p>
+<h3 id="LOCAL_DISABLE_RELRO">LOCAL_DISABLE_RELRO</h3><p>未了解</p>
+<h3 id="LOCAL_DISABLE_FORMAT_STRING_CHECKS">LOCAL_DISABLE_FORMAT_STRING_CHECKS</h3><p>编译系统编译代码时，默认提供字符串格式化保护。当使用<code>printf</code>之类的函数格式化一个非常量的字符串时会引发一个编译器错误。<br>保护默认打开，可通过设置该值为<code>true</code>进行关闭。没有无法避免的理由不建议这么做。</p>
+<h3 id="LOCAL_EXPORT_CFLAGS">LOCAL_EXPORT_CFLAGS</h3><p>该变量记录的编译选项会被添加到通过<code>LOCAL_STATIC_LIBRARIES</code>或<code>LOCAL_SHARED_LIBRARIES</code>使用该模块的其它模块的<code>LOCAL_CFLAGS</code>中。<br>如下例：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">include $(CLEAR_VARS)</span><br><span class="line">LO<span class="built_in">CAL_MODULE</span> := foo</span><br><span class="line">LO<span class="built_in">CAL_SRC_FILES</span> := foo/foo<span class="variable">.c</span></span><br><span class="line">LO<span class="built_in">CAL_EXPORT_CFLAGS</span> := -DFOO=<span class="number">1</span></span><br><span class="line">include $(B<span class="built_in">UILD_STATIC_LIBRARY</span>)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">include $(CLEAR_VARS)</span><br><span class="line">LO<span class="built_in">CAL_MODULE</span> := bar</span><br><span class="line">LO<span class="built_in">CAL_SRC_FILES</span> := bar<span class="variable">.c</span></span><br><span class="line">LO<span class="built_in">CAL_CFLAGS</span> := -DBAR=<span class="number">2</span></span><br><span class="line">LO<span class="built_in">CAL_STATIC_LIBRARIES</span> := foo</span><br><span class="line">include $(B<span class="built_in">UILD_SHARED_LIBRARY</span>)</span><br></pre></td></tr></table></figure></p>
+<p><code>bar.c</code>编译时会同时启用<code>-DFOO=1</code>以及<code>-DBAR=2</code>。<br>另外，这种模块间的关系是可传递的。若<code>zoo</code>依赖于<code>bar</code>，则<code>zoo</code>也会继承<code>foo</code>中导出的标志位。<br>最后，导出的变量在编译本模块时是不是用的。因此，编译<code>foo</code>时，<code>-DFOO=1</code>并未被传递给编译器。</p>
+<h3 id="LOCAL_EXPORT_CPPFLAGS">LOCAL_EXPORT_CPPFLAGS</h3><p>与<code>LOCAL_EXPORT_CFLAGS</code>相同，但仅用于C++标志。</p>
+<h3 id="LOCAL_EXPORT_C_INCLUDES">LOCAL_EXPORT_C_INCLUDES</h3><p>与<code>LOCAL_EXPORT_CFLAGS</code>相同，用于头文件包含路径。</p>
+<h3 id="LOCAL_EXPORT_LDFLAGS">LOCAL_EXPORT_LDFLAGS</h3><p>导出链接器设置</p>
+<h3 id="LOCAL_EXPORT_LDLIBS">LOCAL_EXPORT_LDLIBS</h3><p>导出需要链接的系统库，例如<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">CLEAR_VARS</span>)</span><br><span class="line"><span class="constant">LOCAL_MODULE</span> <span class="symbol">:</span>= foo</span><br><span class="line"><span class="constant">LOCAL_SRC_FILES</span> <span class="symbol">:</span>= foo/foo.c</span><br><span class="line"><span class="constant">LOCAL_EXPORT_LDLIBS</span> <span class="symbol">:</span>= -llog</span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">BUILD_STATIC_LIBRARY</span>)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">CLEAR_VARS</span>)</span><br><span class="line"><span class="constant">LOCAL_MODULE</span> <span class="symbol">:</span>= bar</span><br><span class="line"><span class="constant">LOCAL_SRC_FILES</span> <span class="symbol">:</span>= bar.c</span><br><span class="line"><span class="constant">LOCAL_STATIC_LIBRARIES</span> <span class="symbol">:</span>= foo</span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">BUILD_SHARED_LIBRARY</span>)</span><br></pre></td></tr></table></figure></p>
+<p>在上例中，编译系统在构建<code>libbar.so</code>时，会将<code>-llog</code>放到链接命令的最后。因为·libbar.so·依赖于<code>foo</code>，而<code>foo</code>依赖于系统日志库。</p>
+<h3 id="LOCAL_SHORT_COMMANDS">LOCAL_SHORT_COMMANDS</h3><p>主要用于Windows系统。Windows系统命令行最多只能接收8191个字符，当项目非常复杂时，编译命令往往会超出这个限制。将这个变量设为<code>true</code>可以缩短编译命令。<br>可以在<code>Application.mk</code>中定义<code>APP_SHORT_COMMANDS</code>以在所有模块中启用该行为。<br>不建议默认开启该特性，因为它会导致编译速度变慢。</p>
+<h3 id="LOCAL_THIN_ARCHIVE">LOCAL_THIN_ARCHIVE</h3><p>用于静态库，可减小库文件大小，未做详细了解</p>
+<h3 id="LOCAL_FILTER_ASM">LOCAL_FILTER_ASM</h3><p>未做了解</p>
+<h2 id="NDK提供的函数宏">NDK提供的函数宏</h2><hr>
+<p>本节介绍NDK提供的GNU Make函数宏。使用<code>$(call &lt;function&gt;)</code>来执行它们，它们会返回文本形式的信息。</p>
+<h3 id="my-dir">my-dir</h3><p>返回最近一次包含的makefile文件的路径，一般是当前<code>Android.mk</code>文件的路径。在<code>Android.mk</code>文件开头定义<code>LOCAL_PATH</code>时，<code>my-dir</code>非常有用。<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH := $(<span class="flow">call</span> my-<span class="built_in">dir</span>)</span><br></pre></td></tr></table></figure></p>
+<p>基于GNU Make的工作方式，这个宏返回的实际上是编译系统在解析构建脚本时所引入的最后一个makfile文件的路径。因此，你不应该在包含另一个文件之后再调用<code>my-dir</code>。<br>例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH := $(<span class="operator"><span class="keyword">call</span> my-dir)</span><br><span class="line"># ... <span class="keyword">declare</span> one <span class="keyword">module</span></span><br><span class="line"><span class="keyword">include</span> $(LOCAL_PATH)/foo/<span class="string">`Android.mk`</span></span><br><span class="line">LOCAL_PATH := $(<span class="keyword">call</span> my-dir)</span><br><span class="line"># ... <span class="keyword">declare</span> another <span class="keyword">module</span></span></span><br></pre></td></tr></table></figure></p>
+<p>这里的问题在于，当第二次调用<code>my-dir</code>来定义<code>LOCAL_PATH</code>时，实际上反悔的是<code>$PATH/foo</code>而不是<code>$PATH</code>，因为它才是最近所包含的文件。<br>你可以将额外文件的包含放在最后来避免这个问题，如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH := $(<span class="operator"><span class="keyword">call</span> my-dir)</span><br><span class="line"># ... <span class="keyword">declare</span> one <span class="keyword">module</span></span><br><span class="line">LOCAL_PATH := $(<span class="keyword">call</span> my-dir)</span><br><span class="line"># ... <span class="keyword">declare</span> another <span class="keyword">module</span></span><br><span class="line"># extra includes <span class="keyword">at</span> the <span class="keyword">end</span> <span class="keyword">of</span> the Android.mk <span class="keyword">file</span></span><br><span class="line"><span class="keyword">include</span> $(LOCAL_PATH)/foo/Android.mk</span></span><br></pre></td></tr></table></figure></p>
+<p>如果这个方法不太方便，可以将<code>my-dir</code>的值存入另一个变量，例如：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="constant">MY_LOCAL_PATH</span> <span class="symbol">:</span>= <span class="variable">$(</span>call my-dir)</span><br><span class="line"><span class="constant">LOCAL_PATH</span> <span class="symbol">:</span>= <span class="variable">$(</span><span class="constant">MY_LOCAL_PATH</span>)</span><br><span class="line"><span class="comment"># ... declare one module</span></span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(</span><span class="constant">LOCAL_PATH</span>)/foo/<span class="string">`Android.mk`</span></span><br><span class="line"><span class="constant">LOCAL_PATH</span> <span class="symbol">:</span>= <span class="variable">$(</span><span class="constant">MY_LOCAL_PATH</span>)</span><br><span class="line"><span class="comment"># ... declare another module</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="all-subdir-makefile">all-subdir-makefile</h3><p>返回当前<code>my-dir</code>目录下所有子目录中的<code>Android.mk</code>路径。<br>你可以通过这个函数来向编译系统提供嵌套式的源代码目录结构。默认情况下，NDK只会在包含<code>Android.mk</code>文件的目录下查找文件。</p>
+<h3 id="this-makefile">this-makefile</h3><p>返回当前makefile的路径</p>
+<h3 id="parent-makefile">parent-makefile</h3><p>返回包含当前makefile的makefile的路径</p>
+<h3 id="grand-parent-makefile">grand-parent-makefile</h3><p>返回更上一级的makefile的路径</p>
+<h3 id="import-module">import-module</h3><p>通过模块的名字查找并包含对应的<code>Android.mk</code>文件，举例：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(</span>call import-<span class="class"><span class="keyword">module</span>,<span class="inheritance">&lt;<span class="parent">name</span></span>&gt;)</span></span><br></pre></td></tr></table></figure></p>
+<p>在这个例子中，编译系统会在<code>NDK_MODULE_PATH</code>环境变量所指向的目录中查找名为<code>&lt;name&gt;</code>的模块，并自动包含其<code>Android.mk</code>文件。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/NDK/" rel="tag">#NDK</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/09/18/Application-mk文件介绍/" rel="prev">Application.mk文件介绍</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="upDownDown" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">upDownDown</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基础知识"><span class="nav-number">2.</span> <span class="nav-text">基础知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#变量与宏定义"><span class="nav-number">3.</span> <span class="nav-text">变量与宏定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NDK_预定义变量"><span class="nav-number">3.1.</span> <span class="nav-text">NDK 预定义变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CLEAR_VALS"><span class="nav-number">3.1.1.</span> <span class="nav-text">CLEAR_VALS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BUILD_SHARED_LIBRARY"><span class="nav-number">3.1.2.</span> <span class="nav-text">BUILD_SHARED_LIBRARY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BUILD_STATIC_LIBRARY"><span class="nav-number">3.1.3.</span> <span class="nav-text">BUILD_STATIC_LIBRARY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PREBUILT_SHARED_LIBRARY"><span class="nav-number">3.1.4.</span> <span class="nav-text">PREBUILT_SHARED_LIBRARY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PREBUILT_STATIC_LIBRARY"><span class="nav-number">3.1.5.</span> <span class="nav-text">PREBUILT_STATIC_LIBRARY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TARGET_ARCH"><span class="nav-number">3.1.6.</span> <span class="nav-text">TARGET_ARCH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TARGET_PLATFORM"><span class="nav-number">3.1.7.</span> <span class="nav-text">TARGET_PLATFORM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TARGET_ARCH_ABI"><span class="nav-number">3.1.8.</span> <span class="nav-text">TARGET_ARCH_ABI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TARGET_ABI"><span class="nav-number">3.1.9.</span> <span class="nav-text">TARGET_ABI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模块描述变量"><span class="nav-number">3.2.</span> <span class="nav-text">模块描述变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_PATH"><span class="nav-number">3.2.1.</span> <span class="nav-text">LOCAL_PATH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_MODULE"><span class="nav-number">3.2.2.</span> <span class="nav-text">LOCAL_MODULE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_MODULE_FILENAME"><span class="nav-number">3.2.3.</span> <span class="nav-text">LOCAL_MODULE_FILENAME</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_SRC_FILES"><span class="nav-number">3.2.4.</span> <span class="nav-text">LOCAL_SRC_FILES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_CPP_EXTENSION"><span class="nav-number">3.2.5.</span> <span class="nav-text">LOCAL_CPP_EXTENSION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_CPP_FEATURES"><span class="nav-number">3.2.6.</span> <span class="nav-text">LOCAL_CPP_FEATURES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_C_INCLUDES"><span class="nav-number">3.2.7.</span> <span class="nav-text">LOCAL_C_INCLUDES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_CFLAGS"><span class="nav-number">3.2.8.</span> <span class="nav-text">LOCAL_CFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_CPPFLAGS"><span class="nav-number">3.2.9.</span> <span class="nav-text">LOCAL_CPPFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_STATIC_LIBRARIES"><span class="nav-number">3.2.10.</span> <span class="nav-text">LOCAL_STATIC_LIBRARIES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_SHARED_LIBRARIES"><span class="nav-number">3.2.11.</span> <span class="nav-text">LOCAL_SHARED_LIBRARIES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_WHOLE_STATIC_LIBRARIES"><span class="nav-number">3.2.12.</span> <span class="nav-text">LOCAL_WHOLE_STATIC_LIBRARIES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_LDLIBS"><span class="nav-number">3.2.13.</span> <span class="nav-text">LOCAL_LDLIBS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_LDFLAGS"><span class="nav-number">3.2.14.</span> <span class="nav-text">LOCAL_LDFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_ALLOW_UNDEFINED_SYMBOLS"><span class="nav-number">3.2.15.</span> <span class="nav-text">LOCAL_ALLOW_UNDEFINED_SYMBOLS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_ARM_MODE"><span class="nav-number">3.2.16.</span> <span class="nav-text">LOCAL_ARM_MODE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_ARM_NEON"><span class="nav-number">3.2.17.</span> <span class="nav-text">LOCAL_ARM_NEON</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_DISABLE_NO_EXECUTE"><span class="nav-number">3.2.18.</span> <span class="nav-text">LOCAL_DISABLE_NO_EXECUTE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_DISABLE_RELRO"><span class="nav-number">3.2.19.</span> <span class="nav-text">LOCAL_DISABLE_RELRO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_DISABLE_FORMAT_STRING_CHECKS"><span class="nav-number">3.2.20.</span> <span class="nav-text">LOCAL_DISABLE_FORMAT_STRING_CHECKS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_EXPORT_CFLAGS"><span class="nav-number">3.2.21.</span> <span class="nav-text">LOCAL_EXPORT_CFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_EXPORT_CPPFLAGS"><span class="nav-number">3.2.22.</span> <span class="nav-text">LOCAL_EXPORT_CPPFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_EXPORT_C_INCLUDES"><span class="nav-number">3.2.23.</span> <span class="nav-text">LOCAL_EXPORT_C_INCLUDES</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_EXPORT_LDFLAGS"><span class="nav-number">3.2.24.</span> <span class="nav-text">LOCAL_EXPORT_LDFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_EXPORT_LDLIBS"><span class="nav-number">3.2.25.</span> <span class="nav-text">LOCAL_EXPORT_LDLIBS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_SHORT_COMMANDS"><span class="nav-number">3.2.26.</span> <span class="nav-text">LOCAL_SHORT_COMMANDS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_THIN_ARCHIVE"><span class="nav-number">3.2.27.</span> <span class="nav-text">LOCAL_THIN_ARCHIVE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL_FILTER_ASM"><span class="nav-number">3.2.28.</span> <span class="nav-text">LOCAL_FILTER_ASM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NDK提供的函数宏"><span class="nav-number">3.3.</span> <span class="nav-text">NDK提供的函数宏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#my-dir"><span class="nav-number">3.3.1.</span> <span class="nav-text">my-dir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#all-subdir-makefile"><span class="nav-number">3.3.2.</span> <span class="nav-text">all-subdir-makefile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#this-makefile"><span class="nav-number">3.3.3.</span> <span class="nav-text">this-makefile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parent-makefile"><span class="nav-number">3.3.4.</span> <span class="nav-text">parent-makefile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grand-parent-makefile"><span class="nav-number">3.3.5.</span> <span class="nav-text">grand-parent-makefile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#import-module"><span class="nav-number">3.3.6.</span> <span class="nav-text">import-module</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">upDownDown</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

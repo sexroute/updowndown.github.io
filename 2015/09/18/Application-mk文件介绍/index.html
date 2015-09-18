@@ -1,0 +1,673 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+
+
+  <meta name="keywords" content="Android,NDK," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="本文档解释了Application.mk编译文件，它描述了APP所需的本地 模块 。一个模块可以是一个静态库、一个共享库或一个可执行文件。建议先了解相关概念以及Android.mk信息。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Application.mk文件介绍">
+<meta property="og:url" content="/2015/09/18/Application-mk文件介绍/index.html">
+<meta property="og:site_name" content="风过留痕">
+<meta property="og:description" content="本文档解释了Application.mk编译文件，它描述了APP所需的本地 模块 。一个模块可以是一个静态库、一个共享库或一个可执行文件。建议先了解相关概念以及Android.mk信息。">
+<meta property="og:updated_time" content="2015-09-18T00:12:35.970Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Application.mk文件介绍">
+<meta name="twitter:description" content="本文档解释了Application.mk编译文件，它描述了APP所需的本地 模块 。一个模块可以是一个静态库、一个共享库或一个可执行文件。建议先了解相关概念以及Android.mk信息。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> Application.mk文件介绍 | 风过留痕 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">风过留痕</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              Application.mk文件介绍
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-18T08:11:41+08:00" content="2015-09-18">
+            2015-09-18
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/Android开发/" itemprop="url" rel="index">
+                  <span itemprop="name">Android开发</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>本文档解释了<code>Application.mk</code>编译文件，它描述了APP所需的本地 <em>模块</em> 。一个模块可以是一个静态库、一个共享库或一个可执行文件。<br>建议先了解相关概念以及Android.mk信息。</p>
+<a id="more"></a>
+<h3 id="概述">概述</h3><hr>
+<p><code>Application.mk</code>文件实际上是定义了关于编译的一些变量的小型GNU Makefile片段。它通常位于项目下的<code>jni</code>目录中。另外，它还可以放在<code>$NDK/apps/</code>下的某一个子目录中，例如：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$NDK</span>/apps/&lt;myapp&gt;/Application.mk</span><br></pre></td></tr></table></figure>
+<p>这里的<code>&lt;myapp&gt;</code>是一个用于向NDK编译系统描述你的APP的名字。它并不会在你生成的共享库或包中使用。</p>
+<h3 id="变量">变量</h3><hr>
+<h4 id="APP_PROJECT_PATH">APP_PROJECT_PATH</h4><p>这个变量保存你的APP项目的根目录的绝对路径。编译系统会通过这个信息来将生成的JNI共享库放到特定的位置，以备APK生成工具使用。<br>如果你将<code>Application.mk</code>文件放在<code>$NDK/apps/&lt;myapp&gt;/</code>中，那么你必须定义这个变量。若放在<code>$PROJECT/jni/</code>中，则可以不用定义它。</p>
+<h4 id="APP_OPTIM">APP_OPTIM</h4><p>可选值为<code>release</code>或<code>debug</code>。使用它来改变生成模块的优化级别。<br>默认为Release模式，会生成经过高度优化的二进制文件。Debug模式生成未优化的二进制文件以便于调试。<br>实际上你既能调试release文件也能调试debug文件。但是，release文件在调试过程中所能提供的信息更少。<br>在程序的manifest的<application>标签中声明<code>android:debuggable</code>可以让编译系统默认生成<code>debug</code>文件。但最终采用哪种模式以显示声明的<code>APP_OPTIM</code>为准。</application></p>
+<h4 id="APP_CFLAGS">APP_CFLAGS</h4><p>这个变量中存储的是一组编译器选项，当编译任意模块中的任意C/C++代码时，这些选项会被构建系统传递给编译器。你可以根据应用程序的需求来改变给定模块的构建方式，而不需要修改给定模块的<code>Android.mk</code>文件。<br>要注意的是这些选项所给出的路径是相对于NDK目录的路径。例如，你有如下配置文件<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sources<span class="regexp">/foo/</span>Android.mk</span><br><span class="line">sources<span class="regexp">/bar/</span>Android.mk</span><br></pre></td></tr></table></figure></p>
+<p>你希望在编译<code>foo/Android.mk</code>时添加指向<code>bar</code>目录的路径，你应该这样使用<br><figure class="highlight fix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">APP_CFLAGS +</span>=<span class="string"> -Isources/bar</span></span><br></pre></td></tr></table></figure></p>
+<p>或者是<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="constant">APP_CFLAGS</span> += -I<span class="variable">$(LOCAL_PATH)</span>/../bar</span><br></pre></td></tr></table></figure></p>
+<p><code>-I../bar</code>无法正常工作，因为它等效于<code>-I$NDK_ROOT/../bar</code></p>
+<blockquote>
+<p><strong>注：</strong> 在android-ndk-1.5_r1中，该变量仅作用与C文件。</p>
+</blockquote>
+<h4 id="APP_CPPFLAGS">APP_CPPFLAGS</h4><p>与<code>APP_CFLAGS</code>相同，但仅作用于C++文件。</p>
+<blockquote>
+<p><strong>注：</strong> 在android-ndk-1.5_r1中，该变量同时作用与C/C++文件。</p>
+</blockquote>
+<h4 id="APP_LDFLAGS">APP_LDFLAGS</h4><p>链接程序时构建系统传递给链接器的一组链接选项。仅在构建共享库与可执行文件时生效。</p>
+<h4 id="APP_BUILD_SCRIPT">APP_BUILD_SCRIPT</h4><p>默认使用<code>jni/</code>文件夹下的<code>Android.mk</code>作为编译脚本。<br>你可以通过修改该变量来使用别的编译脚本。路径相对于NDK的顶层目录。</p>
+<h4 id="APP_ABI">APP_ABI</h4><p>NDK构建系统默认为<code>armeabi</code>生成机器码。它对应的是带浮点运算的ARMv5TE架构的CPU。你可以通过<code>APP_ABI</code>来选择不同的ABI。<br><strong>表1.</strong> 不同指令集的<code>APP_ABI</code>设定</p>
+<table>
+<thead>
+<tr>
+<th>指令集</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hardware FPU instructions on ARMv7 based devices</td>
+<td>APP_ABI := armeabi-v7a</td>
+</tr>
+<tr>
+<td>ARMv8 AArch64</td>
+<td>APP_ABI := arm64-v8a</td>
+</tr>
+<tr>
+<td>ARMv8 AArch64</td>
+<td>arm64-v8a</td>
+</tr>
+<tr>
+<td>IA-32</td>
+<td>APP_ABI := x86</td>
+</tr>
+<tr>
+<td>Intel64</td>
+<td>APP_ABI := x86_64</td>
+</tr>
+<tr>
+<td>MIPS32</td>
+<td>APP_ABI := mips</td>
+</tr>
+<tr>
+<td>MIPS64 (r6)</td>
+<td>APP_ABI := mips64</td>
+</tr>
+<tr>
+<td>All supported instruction sets</td>
+<td>APP_ABI := all</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>注：</strong> <code>all</code>选项自NDKr7之后生效</p>
+</blockquote>
+<p>你也可以同时指定多个指令集，利用空格分隔。例如<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rule"><span class="attribute">APP_ABI </span>:<span class="value">= armeabi armeabi-v7a x86 mips</span></span></span><br></pre></td></tr></table></figure></p>
+<p>关于支持的ABI以及关于它们用法与限制的详细信息，参考<a href="https://developer.android.com/ndk/guides/abis.html" target="_blank" rel="external">ABI Management</a>。</p>
+<h4 id="APP_PLATFORM">APP_PLATFORM</h4><p>目标Android平台的名字，如<code>android-3</code>，详见<a href="https://developer.android.com/ndk/guides/stable_apis.html" target="_blank" rel="external">Android NDK Native APIs</a>。</p>
+<h4 id="APP_STL">APP_STL</h4><p>NDK构建系统默认提供的是最小C++运行时库的头文件(<code>system/lib/libstdc++.so</code>)。该库由Android系统提供。但是，你也可以在你的程序中使用或链接可选的其它C++实现。使用<code>APP_STL</code>来选择其中一个。关于更多信息，查看<a href="https://developer.android.com/ndk/guides/cpp-support.html#runtimes" target="_blank" rel="external">NDK Runtimes and Features</a>。</p>
+<h4 id="APP_SHORT_COMMANDS">APP_SHORT_COMMANDS</h4><p>等效于<code>Android.mk</code>中的<code>LOCAL_SHORT_COMMANDS</code>。</p>
+<h4 id="NDK_TOOLCHAIN_VERSION">NDK_TOOLCHAIN_VERSION</h4><p>选择GCC编译器的版本，可选值为<code>4.9</code>或<code>4.8</code>。64位的ABI默认使用4.9版本，32位的ABI默认使用<code>4.8</code>版本。若使用Clang进行编译，可选值为<code>clang3.4</code>、<code>clang3.5</code>或<code>clang</code>。使用<code>clang</code>时会自动选择最新的版本。</p>
+<h4 id="APP_PIE">APP_PIE</h4><p>未做了解</p>
+<h4 id="APP_THIN_ARCHIVE">APP_THIN_ARCHIVE</h4><p>未做了解</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/NDK/" rel="tag">#NDK</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/17/Android-mk文件介绍/" rel="next">Android.mk文件介绍</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="upDownDown" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">upDownDown</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">2.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_PROJECT_PATH"><span class="nav-number">2.1.</span> <span class="nav-text">APP_PROJECT_PATH</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_OPTIM"><span class="nav-number">2.2.</span> <span class="nav-text">APP_OPTIM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_CFLAGS"><span class="nav-number">2.3.</span> <span class="nav-text">APP_CFLAGS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_CPPFLAGS"><span class="nav-number">2.4.</span> <span class="nav-text">APP_CPPFLAGS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_LDFLAGS"><span class="nav-number">2.5.</span> <span class="nav-text">APP_LDFLAGS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_BUILD_SCRIPT"><span class="nav-number">2.6.</span> <span class="nav-text">APP_BUILD_SCRIPT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_ABI"><span class="nav-number">2.7.</span> <span class="nav-text">APP_ABI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_PLATFORM"><span class="nav-number">2.8.</span> <span class="nav-text">APP_PLATFORM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_STL"><span class="nav-number">2.9.</span> <span class="nav-text">APP_STL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_SHORT_COMMANDS"><span class="nav-number">2.10.</span> <span class="nav-text">APP_SHORT_COMMANDS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NDK_TOOLCHAIN_VERSION"><span class="nav-number">2.11.</span> <span class="nav-text">NDK_TOOLCHAIN_VERSION</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_PIE"><span class="nav-number">2.12.</span> <span class="nav-text">APP_PIE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APP_THIN_ARCHIVE"><span class="nav-number">2.13.</span> <span class="nav-text">APP_THIN_ARCHIVE</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">upDownDown</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
